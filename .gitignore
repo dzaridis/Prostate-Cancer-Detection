@@ -2,3 +2,11 @@
 EXPERIMENTS
 External_Validation_Results
 ProstateNetData
+.idea/
+CONFIG.json
+NOTEBOOKS/
+PROSTATE_LESION_DETECTION_EXPERIMENT.ipynb
+data/
+issues/
+nii_files/
+scripts/
