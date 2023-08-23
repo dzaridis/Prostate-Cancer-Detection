@@ -1,0 +1,10 @@
+.idea
+data
+issues
+nii_files
+NOTEBOOKS
+*.pyc
+.gitignore.bak
+PROSTATE_LESION_DETECTION_EXPERIMENT.ipynb
+CONFIG.json
+scripts

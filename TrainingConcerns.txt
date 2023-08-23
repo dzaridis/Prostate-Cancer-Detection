@@ -1,0 +1,3 @@
+Trained a Vision Transformer of 400 million parameters, 20K samples and 100 epochs 
+Very variant Data
+Got very coerrce feature maps and therefore needed to train for more epochs and lower learning rate
