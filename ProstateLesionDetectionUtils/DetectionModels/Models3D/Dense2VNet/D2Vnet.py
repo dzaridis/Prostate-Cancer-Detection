@@ -103,7 +103,7 @@ class TrainDenseVnet:
             validation_steps = 5,
             batch_size = self.params["BATCH_SIZE"],
             epochs=self.params["EPOCHS"],
-            verbose=0,
+            verbose=1,
             callbacks=self.params["CALLBACKS"])
         end = (time.time() - Start) / 60
         print("Time needed for training:",end)
