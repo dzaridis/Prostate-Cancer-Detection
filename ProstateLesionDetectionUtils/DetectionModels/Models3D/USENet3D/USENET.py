@@ -93,7 +93,7 @@ class TrainUSEnet:
         print("Time needed for training:",end)
     
     def LoadTrained(self):
-        self.model.load_weights(self.params["WEIGHTS"])
+        self.model.load_weights(self.params["INITIAL_WEIGHTS"])
     
     def GetHistory(self):
         return self.history

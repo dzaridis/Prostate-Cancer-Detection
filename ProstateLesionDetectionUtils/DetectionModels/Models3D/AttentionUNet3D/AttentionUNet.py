@@ -6,7 +6,7 @@ from tensorflow.keras.models import Model
 from ProstateLesionDetectionUtils.DetectionModels.Models3D import LayerUtils3D
 import tensorflow_addons as tfa
 import time
-from ProstateLesionDetectionUtils.DetectionModels.Models3D.UnetModel3D.EncodersDecoders import *
+from ProstateLesionDetectionUtils.DetectionModels.Models3D.AttentionUNet3D.EncodersDecoders import *
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
         
 
@@ -94,7 +94,7 @@ class TrainAttentionUnet:
         print("Time needed for training:",end)
     
     def LoadTrained(self):
-        self.model.load_weights(self.params["WEIGHTS"])
+        self.model.load_weights(self.params["INITIAL_WEIGHTS"])
     
     def GetHistory(self):
         return self.history
