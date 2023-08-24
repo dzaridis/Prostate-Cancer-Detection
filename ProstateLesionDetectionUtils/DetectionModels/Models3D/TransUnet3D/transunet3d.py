@@ -108,8 +108,9 @@ class TrainTransUnet:
         """
         Start = time.time()
         self.history = self.model.fit(
-            self.params["TRAIN_DATASET"],
-            validation_data = self.params["VAL_DATASET"],
+            x=self.params["TRAIN_DATASET"]["DATA"],
+            y=self.params["TRAIN_DATASET"]["LABELS"],
+            validation_data = (self.params["VAL_DATASET"]["DATA"],self.params["VAL_DATASET"]["LABELS"]),
             validation_steps = 5,
             batch_size = self.params["BATCH_SIZE"],
             epochs=self.params["EPOCHS"],
