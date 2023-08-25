@@ -108,6 +108,9 @@ class TrainDenseVnet:
             callbacks=self.params["CALLBACKS"])
         end = (time.time() - Start) / 60
         print("Time needed for training:",end)
+        
+    def SaveInitWeights(self):
+        self.model.save_weights(self.params["INITIAL_WEIGHTS"])
     
     def LoadTrained(self):
         self.model.load_weights(self.params["INITIAL_WEIGHTS"])
