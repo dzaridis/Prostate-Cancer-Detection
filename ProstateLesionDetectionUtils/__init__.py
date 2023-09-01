@@ -4,3 +4,4 @@ import ProstateLesionDetectionUtils.DetectionModels
 import ProstateLesionDetectionUtils.DetectionMetrics
 import ProstateLesionDetectionUtils.UnitTesting
 import ProstateLesionDetectionUtils.SegmentationMetrics
+import ProstateLesionDetectionUtils.Evaluation
