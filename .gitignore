@@ -11,4 +11,6 @@ scripts
 EXPERIMENTS
 External_Validation_Results
 ProstateNetData
-*ipynb
+*.ipynb
+ProstateLesionDetection_Training_ProstateNet.ipynb
+.gitignore
