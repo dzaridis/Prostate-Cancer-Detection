@@ -7,7 +7,25 @@ import SimpleITK as sitk
 
 from ProstateLesionDetectionUtils.DetectionMetrics.Metric import DetorientMetric
 from ProstateLesionDetectionUtils.DetectionMetrics.ModelDetoriention import DetorientLesions
+from ProstateLesionDetectionUtils.Evaluation.Loss_functions import dice_coefficient
 
+class Sensitivity_Analysis:
+    def __init__(self, ytrue, ypred) -> None:
+        self.ytrue = ytrue
+        self.ypred = ypred
+        self.ths = {}
+    
+    def extract_thresholds(self, num_thresholds = 20):
+        """performs the sensitivity analysis for a patient and specific thresholds
+        num_thresholds[int]: number of thresholds. Defaults to 20
+        """
+        thrs = np.linspace(0.0, 1, num = num_thresholds)
+        tr = tf.cast(self.ytrue,tf.float32)
+        for val in thrs:
+            pred_done = np.where(self.ypred>val,1,0)
+            prd= tf.cast(pred_done, tf.float32)
+            self.ths.update({val: dice_coefficient(prd, tr).numpy()})
+        return self.ths
 
 class Evaluation:
     def __init__(self, parameters):
@@ -91,12 +109,22 @@ class Evaluation:
             vol_sitk = sitk.GetImageFromArray(vol)
             vol_sitk.CopyInformation(self.parameters["EVALUATION_DATA"][key]["Lesions"])
             labels = [1]
-            metrics.update({key:sg.write_metrics(labels = labels,  # exclude background
+            wm = sg.write_metrics(labels = labels,  # exclude background
                     gdth_img=self.parameters["EVALUATION_DATA"][key]["Lesions"],
-                    pred_img=vol_sitk)})
+                    pred_img=vol_sitk)
+            tr = tf.cast(sitk.GetArrayFromImage(self.parameters["EVALUATION_DATA"][key]["Lesions"]),tf.float32)
+            prd= tf.cast(sitk.GetArrayFromImage(self.predictions[key]), tf.float32)
+            sna = Sensitivity_Analysis(sitk.GetArrayFromImage(self.parameters["EVALUATION_DATA"][key]["Lesions"]),
+                                       sitk.GetArrayFromImage(self.predictions[key]))
+            thrs = sna.extract_thresholds()
+
+            wm[0].update({"Dice Volumetric":dice_coefficient(tr, prd).numpy(),
+                          "Sensitivity Analysis": thrs})
+            metrics.update({key:wm})
             if len(self.mtr)>0:
                 metrics[key][0].update(self.mtr[key])
         return metrics
+
     
     def get_predictions(self):
         return self.predictions
