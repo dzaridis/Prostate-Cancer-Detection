@@ -13,5 +13,7 @@ External_Validation_Results
 ProstateNetData
 */.ipynb
 ProstateLesionDetection_Training_ProstateNet.ipynb
-Notebooks
+Evaluation.ipynb
+Results_Analysis.ipynb
+*.ipynb
 EXPERIMENTS_V0.2
