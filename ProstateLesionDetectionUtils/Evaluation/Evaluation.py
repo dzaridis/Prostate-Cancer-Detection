@@ -27,7 +27,7 @@ class Sensitivity_Analysis:
             self.ths.update({val: dice_coefficient(prd, tr).numpy()})
         return self.ths
 
-class Evaluation:
+class Model_Prediction:
     def __init__(self, parameters):
         """
         Constructor for the Evaluation Class.
@@ -79,6 +79,16 @@ class Evaluation:
             vol_sitk = sitk.GetImageFromArray(vol)
             vol_sitk.CopyInformation(self.parameters["EVALUATION_DATA"][key]["Lesions"])
             sitk.WriteImage(vol_sitk, os.path.join(os.path.join(self.parameters["SAVE_FOLDER"],"Binary_Predictions"),"{}.nii.gz".format(key)))
+
+class Evaluation:
+    def __init__(self, parameters):
+        """
+        Constructor for the Evaluation Class.
+        Parameters [dict]:  a dictionary containing all the evaluation parameters to execture the evaluation class
+        """
+        self.parameters = parameters
+        self.predictions = {}
+        self.mtr = {}
 
     def calculate_detorient_metric(self):
 
