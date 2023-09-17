@@ -22,17 +22,19 @@ class TransUnetMod(tf.keras.Model):
                  num_heads=12,
                  num_layers=8,
                  emb_dims=256,
-                 dropout_rate=0.1):
+                 dropout_rate=0.1, **kwargs):
+        self.kernel_size = kwargs.get('kernel_size', [3 for _ in range(len(num_filters))])
         super(TransUnetMod, self).__init__()
         self.enc_parts = []
         self.dec_parts = []
         self.num_filters = num_filters
         self.inverse = num_filters[::-1]
+        self.inv_kernels = self.kernel_size[::-1]
         unpool_size = pool_size[::-1]
 
         for i in range(len(num_filters) - 1):
 
-            self.enc_parts.append(EncoderBlock(num_filters[i], pool_size[i]))
+            self.enc_parts.append(EncoderBlock(num_filters[i], pool_size[i], kernel_size = self.kernel_size[i]))
 
 
         self.btlneck = Bottleneck(patch_sizexy = patch_sizexy,
@@ -45,9 +47,9 @@ class TransUnetMod(tf.keras.Model):
 
         for i in range(len(num_filters) - 1):
             if i==0:
-                self.dec_parts.append(DecoderBlock(self.inverse[i + 1], unpool_size[i], upsample=False))
+                self.dec_parts.append(DecoderBlock(self.inverse[i + 1], unpool_size[i], upsample=False, kernel_size = self.inv_kernels[i+1]))
             else:
-                self.dec_parts.append(DecoderBlock(self.inverse[i + 1], unpool_size[i], upsample=True))
+                self.dec_parts.append(DecoderBlock(self.inverse[i + 1], unpool_size[i], upsample=True, kernel_size = self.inv_kernels[i+1]))
                 
         self.clf = Classifier()
 
@@ -90,7 +92,7 @@ class TrainTransUnet:
         self.model = TransUnetMod(self.params["FILTERS"], self.params["POOL_SIZE"],
                                   self.params["PATCH_SIZE_XY"], self.params["PATCH_SIZE_Z"],
                                   self.params["TRANSF_HEADS"], self.params["TRANSF_LAYERS"],
-                                  self.params["DROP_RATE"])
+                                  self.params["DROP_RATE"], kernel_size = self.params["kernel_size"])
         self.model.build(input_shape=self.params["INPUT_SIZE"])
 
     def ModelCompile(self):

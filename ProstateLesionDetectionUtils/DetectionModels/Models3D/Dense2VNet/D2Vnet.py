@@ -12,12 +12,14 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 class Dense2VMod(tf.keras.Model):
 
     def __init__(self, num_filters, pool_size, dense_size = 32, growth_rate = 4, dropout_rate = 0.3,
-                 dense_blocks = 2):
+                 dense_blocks = 2, **kwargs):
+        self.kernel_size = kwargs.get('kernel_size', [3 for _ in range(len(num_filters))])
         super(Dense2VMod, self).__init__()
         self.enc_parts = []
         self.dec_parts = []
         self.num_filters = num_filters
         self.inverse = num_filters[::-1]
+        self.inv_kernels = self.kernel_size[::-1]
         unpool_size = pool_size[::-1]
 
         for i in range(len(num_filters)-1):
@@ -25,20 +27,23 @@ class Dense2VMod(tf.keras.Model):
                                                dense_size = dense_size,
                                                growth_rate = growth_rate,
                                                dropout_rate = dropout_rate,
-                                               dense_blocks = dense_blocks))
+                                               dense_blocks = dense_blocks, kernel_size=self.kernel_size[i])
+                                               )
 
         self.btlneck = Bottleneck(num_filters[-1],
                                   dense_size=dense_size,
                                   growth_rate=growth_rate,
                                   dropout_rate=dropout_rate,
-                                  dense_blocks=dense_blocks)
+                                  dense_blocks=dense_blocks,
+                                  kernel_size=self.kernel_size[-1])
 
         for i in range(len(num_filters)-1):
             self.dec_parts.append(DecoderBlock(self.inverse[i+1], unpool_size[i],
                                                dense_size = dense_size,
                                                growth_rate = growth_rate,
                                                dropout_rate = dropout_rate,
-                                               dense_blocks = dense_blocks))
+                                               dense_blocks = dense_blocks,
+                                               kernel_size=self.inv_kernels[i+1]))
 
         self.clf = Classifier()
 
@@ -80,7 +85,7 @@ class TrainDenseVnet:
         # self.Params["INPUT_SIZE"], self.Params["VOLUME_SIZE"],
         self.model = Dense2VMod(self.params["FILTERS"], self.params["POOL_SIZE"],
                                 self.params["DENSE_SIZE"], self.params["GROWTH_RATE"],
-                                self.params["DROPOUT_RATE"], self.params["DENSE_BLOCKS"])
+                                self.params["DROPOUT_RATE"], self.params["DENSE_BLOCKS"], kernel_size = self.params["kernel_size"])
         self.model.build(input_shape=self.params["INPUT_SIZE"])
 
     def ModelCompile(self):

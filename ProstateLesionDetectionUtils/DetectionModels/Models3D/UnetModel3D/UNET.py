@@ -11,21 +11,23 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
         
 
 class UnetMod(tf.keras.Model):
-    def __init__(self, num_filters, pool_size):
+    def __init__(self, num_filters, pool_size, **kwargs):
+        self.kernel_size = kwargs.get('kernel_size', [3 for _ in range(len(num_filters))])
         super(UnetMod, self).__init__()
         self.enc_parts = []
         self.dec_parts = []
         self.num_filters = num_filters
         self.inverse = num_filters[::-1]
+        self.inv_kernels = self.kernel_size[::-1]
         unpool_size = pool_size[::-1]
 
         for i in range(len(num_filters)-1):
-            self.enc_parts.append(EncoderBlock(num_filters[i], pool_size[i]))
+            self.enc_parts.append(EncoderBlock(num_filters[i], pool_size[i], kernel_size = self.kernel_size[i]))
 
-        self.btlneck = Bottleneck(num_filters[-1])
+        self.btlneck = Bottleneck(num_filters[-1], kernel_size = self.kernel_size[-1])
 
         for i in range(len(num_filters)-1):
-            self.dec_parts.append(DecoderBlock(self.inverse[i+1], unpool_size[i]))
+            self.dec_parts.append(DecoderBlock(self.inverse[i+1], unpool_size[i], kernel_size = self.inv_kernels[i+1]))
 
         self.clf = Classifier()
 
@@ -66,7 +68,7 @@ class TrainUnet:
         Create unet model keras instance based
         """
         #self.Params["INPUT_SIZE"], self.Params["VOLUME_SIZE"],
-        self.model = UnetMod(self.params["FILTERS"], self.params["POOL_SIZE"])
+        self.model = UnetMod(num_filters = self.params["FILTERS"], pool_size = self.params["POOL_SIZE"], kernel_size = self.params["kernel_size"])
         self.model.build(input_shape=self.params["INPUT_SIZE"])
     
     def ModelCompile(self):

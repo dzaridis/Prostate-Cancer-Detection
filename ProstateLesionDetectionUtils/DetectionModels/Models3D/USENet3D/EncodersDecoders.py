@@ -4,8 +4,9 @@ from ProstateLesionDetectionUtils.DetectionModels.Models3D import LayerUtils3D
 class EncoderBlock(tf.keras.Model):
 
     def __init__(self, filters, pool_size, **kwargs):
-        super(EncoderBlock,self).__init__(**kwargs)
-        self.convnet = LayerUtils3D.ConvResModule3D(filters)
+        self.kernel_size = kwargs.get('kernel_size', (3,3,3))
+        super(EncoderBlock,self).__init__()
+        self.convnet = LayerUtils3D.ConvResModule3D(filters, kernel_size = self.kernel_size)
         self.squeeze = LayerUtils3D.SqueezeAndExcitation3D(filters)
         self.maxpool = tf.keras.layers.MaxPool3D(pool_size=pool_size, padding='same')
 
@@ -21,8 +22,9 @@ class EncoderBlock(tf.keras.Model):
 class Bottleneck(tf.keras.Model):
 
     def __init__(self, filters, **kwargs):
-        super(Bottleneck,self).__init__(**kwargs)
-        self.convnet = LayerUtils3D.ConvResModule3D(filters)
+        self.kernel_size = kwargs.get('kernel_size', (3,3,3))
+        super(Bottleneck,self).__init__()
+        self.convnet = LayerUtils3D.ConvResModule3D(filters, kernel_size = self.kernel_size)
         self.squeeze = LayerUtils3D.SqueezeAndExcitation3D(filters)
 
     def call(self, input_tensor):
@@ -34,14 +36,15 @@ class Bottleneck(tf.keras.Model):
 class DecoderBlock(tf.keras.Model):
 
     def __init__(self, filters, up_size, **kwargs):
-        super(DecoderBlock,self).__init__(**kwargs)
+        self.kernel_size = kwargs.get('kernel_size', (3,3,3))
+        super(DecoderBlock,self).__init__()
         self.transpose = tf.keras.layers.Conv3DTranspose(
             filters=filters,
-            kernel_size=3,
+            kernel_size = self.kernel_size,
             strides=up_size,
             padding="same")
         self.concat = tf.keras.layers.Concatenate(axis=-1)
-        self.conv2 = LayerUtils3D.ConvResModule3D(filters)
+        self.conv2 = LayerUtils3D.ConvResModule3D(filters, kernel_size = self.kernel_size)
         self.squeeze = LayerUtils3D.SqueezeAndExcitation3D(filters)
 
     def call(self, input_tensor, residual):

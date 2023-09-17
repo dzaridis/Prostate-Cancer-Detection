@@ -10,10 +10,11 @@ class ConvLayer3D(tf.keras.layers.Layer):
         Args:
             filters (int): number of Conv Filters
         """
-        super(ConvLayer3D,self).__init__(**kwargs)
+        self.kernel_size = kwargs.get('kernel_size', (3,3,3))
+        super(ConvLayer3D,self).__init__()
         self.conv = Conv3D(
             filters = filters,
-            kernel_size = 3,
+            kernel_size = self.kernel_size,
             padding = 'same',
             activation = None,
             kernel_initializer='he_normal'
@@ -39,13 +40,14 @@ class DenseCNNlayer3D(tf.keras.layers.Layer):
             GrowthRate (int): growth rate for the Dense layers
             DropOut (float): dropout ratio 0 to 1
         """
-        super(DenseCNNlayer3D,self).__init__(**kwargs)
+        self.kernel_size = kwargs.get('kernel_size', (3,3,3))
+        super(DenseCNNlayer3D,self).__init__()
         self.GrowthRate = GrowthRate
         self.layrs = []
         for _ in range(GrowthRate):
             self.layrs.append([Conv3D(
         filters = filters,
-        kernel_size = 3,
+        kernel_size =  self.kernel_size,
         padding = 'same',
         activation = None,
         kernel_initializer='he_normal'
@@ -98,11 +100,12 @@ class DenseCNNModule3D(tf.keras.layers.Layer):
             DropOut (float): dropout ratio 0 to 1
             NumDenseBlocks (int, optional): Number of DenseBlocks. Defaults to 2.
         """
-        super(DenseCNNModule3D, self).__init__(**kwargs)
+        self.kernel_size = kwargs.get('kernel_size', (3,3,3))
+        super(DenseCNNModule3D, self).__init__()
         self.dns = []
         self.NumDenseBlocks = NumDenseBlocks
-        for DnsNum in range(NumDenseBlocks):
-            self.dns.append([DenseCNNlayer3D(FilterDense,GrowthRate,DropOut),TransitionLayer3D(FilterTrans,DropOut)])
+        for _ in range(NumDenseBlocks):
+            self.dns.append([DenseCNNlayer3D(FilterDense,GrowthRate,DropOut,kernel_size= self.kernel_size),TransitionLayer3D(FilterTrans,DropOut)])
 
     def call(self, input_tensor):
         x = input_tensor
@@ -139,9 +142,10 @@ class ConvModule3D(tf.keras.layers.Layer):
         Args:
             filters (int): number of Conv Filters
         """
-        super(ConvModule3D,self).__init__(**kwargs)
-        self.conv1  = ConvLayer3D(filters)
-        self.conv2  = ConvLayer3D(filters)
+        self.kernel_size = kwargs.get('kernel_size', (3,3,3))
+        super(ConvModule3D,self).__init__()
+        self.conv1  = ConvLayer3D(filters, kernel_size = self.kernel_size)
+        self.conv2  = ConvLayer3D(filters, kernel_size = self.kernel_size)
         self.bn    = BatchNormalization(axis=-1, gamma_regularizer=l2(1e-4), beta_regularizer=l2(1e-4))
         self.act   = ReLU()
         
@@ -154,9 +158,10 @@ class ConvModule3D(tf.keras.layers.Layer):
 
 class ConvResModule3D(tf.keras.layers.Layer):
     def __init__(self, filters, **kwargs):
-        super(ConvResModule3D,self).__init__(**kwargs)
-        self.conv1  = ConvLayer3D(filters)
-        self.conv2  = ConvLayer3D(filters)
+        self.kernel_size = kwargs.get('kernel_size', (3,3,3))
+        super(ConvResModule3D,self).__init__()
+        self.conv1  = ConvLayer3D(filters, kernel_size = self.kernel_size)
+        self.conv2  = ConvLayer3D(filters, kernel_size = self.kernel_size)
         self.idcnv = Conv3D(filters, 1, activation = None, padding = 'same', kernel_initializer = 'he_normal')
         self.bn    = BatchNormalization(axis=-1, gamma_regularizer=l2(1e-4), beta_regularizer=l2(1e-4))
         self.add   = Add()
