@@ -46,10 +46,8 @@ class TransUnetMod(tf.keras.Model):
                  dropout_rate=dropout_rate)
 
         for i in range(len(num_filters) - 1):
-            if i==0:
-                self.dec_parts.append(DecoderBlock(self.inverse[i + 1], unpool_size[i], upsample=False, kernel_size = self.inv_kernels[i+1]))
-            else:
-                self.dec_parts.append(DecoderBlock(self.inverse[i + 1], unpool_size[i], upsample=True, kernel_size = self.inv_kernels[i+1]))
+
+            self.dec_parts.append(DecoderBlock(self.inverse[i + 1], unpool_size[i], upsample=True, kernel_size = self.inv_kernels[i+1]))
                 
         self.clf = Classifier()
 

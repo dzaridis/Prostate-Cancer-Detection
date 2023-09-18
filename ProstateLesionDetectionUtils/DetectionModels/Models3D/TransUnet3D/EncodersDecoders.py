@@ -57,11 +57,11 @@ class Bottleneck(tf.keras.Model):
         self.cnvtr = tf.keras.layers.Conv3DTranspose(
             filters=self.d_model//2,
             kernel_size=(self.patch_sizez,
-                     2*self.patch_sizexy,
-                     2*self.patch_sizexy),
+                     self.patch_sizexy, #2*self.patch_sizexy
+                     self.patch_sizexy), # 2*self.patch_sizexy
             strides=(self.patch_sizez,
-                     2*self.patch_sizexy,
-                     2*self.patch_sizexy),
+                     self.patch_sizexy, #2*self.patch_sizexy
+                     self.patch_sizexy),# 2*self.patch_sizexy
             padding="same")
         super(Bottleneck, self).build(input_shape)
 
@@ -93,6 +93,7 @@ class DecoderBlock(tf.keras.Model):
         x = input_tensor
         if self.upsample:
             x = self.transpose(x)
+        print(x.shape)
         x = self.concat([x, residual])
         x = self.conv2(x)
         return x
