@@ -16,4 +16,8 @@ ProstateLesionDetection_Training_ProstateNet.ipynb
 Evaluation.ipynb
 Results_Analysis.ipynb
 *.ipynb
-EXPERIMENTS_V0.2
+*.tf
+*.h5
+*.nii.gz
+MaterialsGeneral
+MaterialsGeneral.zip
