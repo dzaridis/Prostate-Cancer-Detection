@@ -93,7 +93,6 @@ class DecoderBlock(tf.keras.Model):
         x = input_tensor
         if self.upsample:
             x = self.transpose(x)
-        print(x.shape)
         x = self.concat([x, residual])
         x = self.conv2(x)
         return x

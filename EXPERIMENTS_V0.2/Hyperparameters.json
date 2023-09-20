@@ -1,5 +1,8 @@
 {
  "Overfits bus some models perform":{"FILTERS": [32, 64, 128, 256, 512, 512] , "POOL_SIZE": [(1,2,2),(1,2,2),(2,2,2), (2,2,2), (1,2,2)]},
  "Best Cnns":{"FILTERS": [32, 64, 128, 256, 512, 1024] , "POOL_SIZE": [(1,2,2),(1,2,2),(2,2,2), (2,2,2), (2,2,2)]},
- "Best Transformer":{"FILTERS": [32, 64, 128, 256, 512, 1024] , "POOL_SIZE": [(1,2,2),(1,2,2),(2,2,2), (2,2,2), (1,2,2)]}
+ "Best Transformer":{"FILTERS": [32, 64, 128, 256, 512, 1024] , "POOL_SIZE": [(1,2,2),(1,2,2),(2,2,2), (2,2,2), (1,2,2)]},
+ "NN configurations -> relatively good (same as 1024 filters but lighter models)":{"FILTERS": [32, 64, 128, 256, 512, 1024] ,
+ "KERNEL SIZE":[(1,3,3), (1,3,3), (3,3,3), (3,3,3), (3,3,3)]
+ "KERNEL SIZE": [(1,2,2), (1,2,2), (2,2,2), (2,2,2)]}
 }
